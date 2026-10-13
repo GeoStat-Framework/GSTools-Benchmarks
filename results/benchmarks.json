@@ -1,0 +1,197 @@
+{
+    "benchmark_two_point_statistics.KrigingBenchmarks.peakmem_global_krige": {
+        "code": "class KrigingBenchmarks:\n    def peakmem_global_krige(self, data, backend, case, threads):\n        \"\"\"Measure peak memory of evaluating one global kriging case.\"\"\"\n        self._run_krige(threads)\n\n    def setup(self, data, backend, case, threads):\n        \"\"\"Build the model and ``Krige`` instance outside the timed method.\n    \n        Estimator construction (and the kriging-matrix solve it triggers on\n        first use) is not what we want to measure here, so it happens in\n        ``setup``; the ``time_*``/``peakmem_*`` methods then measure only the\n        kriging evaluation at the target points.\n        \"\"\"\n        cond_pos, cond_val, self._target_pos = data[case]\n        model = gs.Exponential(dim=2, var=1.5, len_scale=12.0, nugget=0.05)\n        self._krige = gs.Krige(\n            model,\n            cond_pos,\n            cond_val,\n            exact=False,\n            cond_err=0.05,\n        )\n\n    def setup_cache(self):\n        \"\"\"Create deterministic kriging inputs once per ASV environment.\"\"\"\n        return {\n            \"small_30x500\": _make_krige_data(20220506, 30, 500),\n            \"large_120x2000\": _make_krige_data(20220507, 120, 2000),\n            \"extra_large_360x6000\": _make_krige_data(20220508, 360, 6000),\n        }",
+        "name": "benchmark_two_point_statistics.KrigingBenchmarks.peakmem_global_krige",
+        "param_names": [
+            "backend",
+            "case",
+            "threads"
+        ],
+        "params": [
+            [
+                "'rust_core'"
+            ],
+            [
+                "'small_30x500'",
+                "'large_120x2000'",
+                "'extra_large_360x6000'"
+            ],
+            [
+                "1",
+                "2",
+                "4",
+                "8"
+            ]
+        ],
+        "setup_cache_key": "benchmark_two_point_statistics:206",
+        "type": "peakmemory",
+        "unit": "bytes",
+        "version": "6c63de4ad05699994198a71a39f366085fac9057e2e8de7c7af354a984da1d7e"
+    },
+    "benchmark_two_point_statistics.KrigingBenchmarks.time_global_krige": {
+        "code": "class KrigingBenchmarks:\n    def time_global_krige(self, data, backend, case, threads):\n        \"\"\"Measure runtime of evaluating one global kriging case.\"\"\"\n        self._run_krige(threads)\n\n    def setup(self, data, backend, case, threads):\n        \"\"\"Build the model and ``Krige`` instance outside the timed method.\n    \n        Estimator construction (and the kriging-matrix solve it triggers on\n        first use) is not what we want to measure here, so it happens in\n        ``setup``; the ``time_*``/``peakmem_*`` methods then measure only the\n        kriging evaluation at the target points.\n        \"\"\"\n        cond_pos, cond_val, self._target_pos = data[case]\n        model = gs.Exponential(dim=2, var=1.5, len_scale=12.0, nugget=0.05)\n        self._krige = gs.Krige(\n            model,\n            cond_pos,\n            cond_val,\n            exact=False,\n            cond_err=0.05,\n        )\n\n    def setup_cache(self):\n        \"\"\"Create deterministic kriging inputs once per ASV environment.\"\"\"\n        return {\n            \"small_30x500\": _make_krige_data(20220506, 30, 500),\n            \"large_120x2000\": _make_krige_data(20220507, 120, 2000),\n            \"extra_large_360x6000\": _make_krige_data(20220508, 360, 6000),\n        }",
+        "min_run_count": 2,
+        "name": "benchmark_two_point_statistics.KrigingBenchmarks.time_global_krige",
+        "number": 1,
+        "param_names": [
+            "backend",
+            "case",
+            "threads"
+        ],
+        "params": [
+            [
+                "'rust_core'"
+            ],
+            [
+                "'small_30x500'",
+                "'large_120x2000'",
+                "'extra_large_360x6000'"
+            ],
+            [
+                "1",
+                "2",
+                "4",
+                "8"
+            ]
+        ],
+        "repeat": 5,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "setup_cache_key": "benchmark_two_point_statistics:206",
+        "type": "time",
+        "unit": "seconds",
+        "version": "054efb98b5633cf76178e370f76630cf276189fde78851d5219683a0466ced53",
+        "warmup_time": -1
+    },
+    "benchmark_two_point_statistics.RandomFieldBenchmarks.peakmem_field_generation": {
+        "code": "class RandomFieldBenchmarks:\n    def peakmem_field_generation(self, data, backend, case, threads):\n        \"\"\"Measure peak memory of one SRF or CondSRF case.\"\"\"\n        self._run_field(data, backend, case, threads)\n\n    def setup_cache(self):\n        \"\"\"Create deterministic random-field inputs once per ASV environment.\"\"\"\n        return {\n            \"unstructured_pos\": _random_points(20220509, 2000, 100.0),\n            \"structured_pos\": (\n                np.linspace(0.0, 100.0, 64),\n                np.linspace(0.0, 100.0, 64),\n            ),\n            \"condsrf\": _make_krige_data(20220510, 40, 1000),\n        }",
+        "name": "benchmark_two_point_statistics.RandomFieldBenchmarks.peakmem_field_generation",
+        "param_names": [
+            "backend",
+            "case",
+            "threads"
+        ],
+        "params": [
+            [
+                "'rust_core'"
+            ],
+            [
+                "'srf_unstructured_randmeth'",
+                "'srf_structured_randmeth'",
+                "'srf_structured_fourier'",
+                "'condsrf_unstructured'"
+            ],
+            [
+                "1",
+                "2",
+                "4",
+                "8"
+            ]
+        ],
+        "setup_cache_key": "benchmark_two_point_statistics:257",
+        "type": "peakmemory",
+        "unit": "bytes",
+        "version": "7fad966662ffddf2b38e8799c6456a91b2ffc819d3eb7ef34b68a070778fc153"
+    },
+    "benchmark_two_point_statistics.RandomFieldBenchmarks.time_field_generation": {
+        "code": "class RandomFieldBenchmarks:\n    def time_field_generation(self, data, backend, case, threads):\n        \"\"\"Measure runtime of one SRF or CondSRF case.\"\"\"\n        self._run_field(data, backend, case, threads)\n\n    def setup_cache(self):\n        \"\"\"Create deterministic random-field inputs once per ASV environment.\"\"\"\n        return {\n            \"unstructured_pos\": _random_points(20220509, 2000, 100.0),\n            \"structured_pos\": (\n                np.linspace(0.0, 100.0, 64),\n                np.linspace(0.0, 100.0, 64),\n            ),\n            \"condsrf\": _make_krige_data(20220510, 40, 1000),\n        }",
+        "min_run_count": 2,
+        "name": "benchmark_two_point_statistics.RandomFieldBenchmarks.time_field_generation",
+        "number": 1,
+        "param_names": [
+            "backend",
+            "case",
+            "threads"
+        ],
+        "params": [
+            [
+                "'rust_core'"
+            ],
+            [
+                "'srf_unstructured_randmeth'",
+                "'srf_structured_randmeth'",
+                "'srf_structured_fourier'",
+                "'condsrf_unstructured'"
+            ],
+            [
+                "1",
+                "2",
+                "4",
+                "8"
+            ]
+        ],
+        "repeat": 5,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "setup_cache_key": "benchmark_two_point_statistics:257",
+        "type": "time",
+        "unit": "seconds",
+        "version": "e50049997d2e6f92957eebec6fd29db5f7dc6a07ea94c80cd48f6630680b87c8",
+        "warmup_time": -1
+    },
+    "benchmark_two_point_statistics.VariogramBenchmarks.peakmem_variogram_estimate": {
+        "code": "class VariogramBenchmarks:\n    def peakmem_variogram_estimate(self, data, backend, case, threads):\n        \"\"\"Measure peak memory of one variogram estimation case.\"\"\"\n        self._run_variogram(data, backend, case, threads)\n\n    def setup_cache(self):\n        \"\"\"Create deterministic variogram inputs once per ASV environment.\"\"\"\n        return {\n            \"full_900\": _make_variogram_data(20220501, 900),\n            \"sampled_5000_to_1500\": _make_variogram_data(20220502, 5000),\n            \"sampled_15000_to_4500\": _make_variogram_data(20220503, 15000),\n        }",
+        "name": "benchmark_two_point_statistics.VariogramBenchmarks.peakmem_variogram_estimate",
+        "param_names": [
+            "backend",
+            "case",
+            "threads"
+        ],
+        "params": [
+            [
+                "'rust_core'"
+            ],
+            [
+                "'full_900'",
+                "'sampled_5000_to_1500'",
+                "'sampled_15000_to_4500'"
+            ],
+            [
+                "1",
+                "2",
+                "4",
+                "8"
+            ]
+        ],
+        "setup_cache_key": "benchmark_two_point_statistics:165",
+        "type": "peakmemory",
+        "unit": "bytes",
+        "version": "f7e7af3c199ebc0a76044246f87f4c02e193ce4c6263c6171665d5f8c9861923"
+    },
+    "benchmark_two_point_statistics.VariogramBenchmarks.time_variogram_estimate": {
+        "code": "class VariogramBenchmarks:\n    def time_variogram_estimate(self, data, backend, case, threads):\n        \"\"\"Measure runtime of one variogram estimation case.\"\"\"\n        self._run_variogram(data, backend, case, threads)\n\n    def setup_cache(self):\n        \"\"\"Create deterministic variogram inputs once per ASV environment.\"\"\"\n        return {\n            \"full_900\": _make_variogram_data(20220501, 900),\n            \"sampled_5000_to_1500\": _make_variogram_data(20220502, 5000),\n            \"sampled_15000_to_4500\": _make_variogram_data(20220503, 15000),\n        }",
+        "min_run_count": 2,
+        "name": "benchmark_two_point_statistics.VariogramBenchmarks.time_variogram_estimate",
+        "number": 1,
+        "param_names": [
+            "backend",
+            "case",
+            "threads"
+        ],
+        "params": [
+            [
+                "'rust_core'"
+            ],
+            [
+                "'full_900'",
+                "'sampled_5000_to_1500'",
+                "'sampled_15000_to_4500'"
+            ],
+            [
+                "1",
+                "2",
+                "4",
+                "8"
+            ]
+        ],
+        "repeat": 5,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "setup_cache_key": "benchmark_two_point_statistics:165",
+        "type": "time",
+        "unit": "seconds",
+        "version": "07648780eeb80a0fc78537d828a2740ac95c2b9b3ff4f302e63800607a232061",
+        "warmup_time": -1
+    },
+    "version": 2
+}
